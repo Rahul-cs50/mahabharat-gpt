@@ -7,6 +7,7 @@ venv/
 env/
 
 *.pt
+!checkpoints/mahabharata_30m_weights.pt
 *.pth
 *.ckpt
 
