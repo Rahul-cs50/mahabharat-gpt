@@ -2,16 +2,16 @@
 
 Decoder-only Transformer language model trained from scratch on a self-curated Mahabharata/Sanskrit corpus using PyTorch.
 
-This repository packages the training notebook into reusable Python modules, records the final 32M-parameter configuration, and includes experiment outputs from the training runs.
+This repository packages the training notebook into reusable Python modules, records the final 32M-parameter configuration, and includes experiment outputs and the trained checkpoint used for the final run.
 
 ## Highlights
 
-| Metric | Result |
+| Item | Value |
 |---|---:|
 | Architecture | Decoder-only Transformer |
-| Parameters | ~32.1M trainable |
+| Trainable parameters | ~32.1M |
 | Vocabulary | 50,257 |
-| Context length | 256 |
+| Context length | 256 tokens |
 | Embedding dimension | 256 |
 | Transformer layers | 8 |
 | Attention heads | 8 |
@@ -21,7 +21,7 @@ This repository packages the training notebook into reusable Python modules, rec
 | Final train perplexity | 13.15 |
 | Final validation perplexity | 21.26 |
 
-## Project Structure
+## Repository Structure
 
 ```text
 mahabharata-gpt/
@@ -34,6 +34,9 @@ mahabharata-gpt/
 │   ├── model.py
 │   ├── tokenizer.py
 │   └── train.py
+├── checkpoints/
+│   ├── README.md
+│   └── mahabharata_30m_weights.pt
 ├── notebooks/
 │   └── mahabharata_gpt_experiments.ipynb
 ├── results/
@@ -41,8 +44,10 @@ mahabharata-gpt/
 │   ├── gita_gpt_loss_overfit.png
 │   ├── loss-plot.pdf
 │   └── samples.txt
-├── checkpoints/
-│   └── README.md
+├── docs/
+│   └── model_card.md
+├── .gitattributes
+├── .gitignore
 ├── requirements.txt
 └── README.md
 ```
@@ -51,7 +56,7 @@ mahabharata-gpt/
 
 The model was trained on a self-curated Sanskrit/Mahabharata text corpus. The corpus was processed as a continuous token sequence using the GPT-2 BPE tokenizer and split into training and validation portions.
 
-The dataset is not included in this repository. Source text licensing should be reviewed before publishing any full corpus extracts.
+The training corpus itself is not included in this repository. Source text licensing should be reviewed before publishing any full corpus extracts.
 
 ## Architecture
 
@@ -72,7 +77,7 @@ Input tokens
   -> next-token logits
 ```
 
-The final run uses the configuration in `configs/32m_config.json`.
+The final run uses the configuration in [`configs/32m_config.json`](configs/32m_config.json).
 
 ## Training
 
@@ -98,25 +103,21 @@ The first small-corpus experiment strongly overfit:
 | Training loss | ~0.04 |
 | Validation loss | ~6.08 |
 
-Scaling the corpus substantially improved validation behavior, showing how important dataset size is when training even a small decoder-only model from scratch.
+Scaling the corpus substantially improved validation behavior, showing the importance of dataset scale when training even a small decoder-only model from scratch.
 
 ## Loss Curves
-
-Available artifacts:
 
 ![Bhagavad Gita training curve](results/gita_gpt_los.png)
 
 ![Small-corpus overfitting curve](results/gita_gpt_loss_overfit.png)
 
-The original PDF loss curve is also included at `results/loss-plot.pdf`.
-
-Additional Mahabharata loss plots and generation screenshots were supplied for the project write-up, but Windows file permissions blocked direct copying from the provided paths during packaging. They can be added under `results/` with names such as `mahabharata_32m_loss.png` and linked here.
+The original PDF loss curve is also included at [`results/loss-plot.pdf`](results/loss-plot.pdf).
 
 ## Generation
 
 The model supports autoregressive generation with temperature sampling, top-k filtering, configurable context length, and custom prompts.
 
-Example outputs are saved in `results/samples.txt`.
+Example outputs are saved in [`results/samples.txt`](results/samples.txt).
 
 ```text
 Prompt: धर्म
@@ -137,21 +138,38 @@ Train from a text file:
 python src/train.py --data path/to/corpus.txt --config configs/32m_config.json
 ```
 
-Generate from a checkpoint:
+Generate from the included checkpoint:
 
 ```bash
-python src/generate.py --checkpoint path/to/mahabharata_30m_weights.pt --prompt "धर्म"
+python src/generate.py \
+  --checkpoint checkpoints/mahabharata_30m_weights.pt \
+  --prompt "धर्म"
 ```
 
 Evaluate a checkpoint:
 
 ```bash
-python src/evaluate.py --checkpoint path/to/mahabharata_30m_weights.pt --data path/to/corpus.txt
+python src/evaluate.py \
+  --checkpoint checkpoints/mahabharata_30m_weights.pt \
+  --data path/to/corpus.txt
 ```
 
-## Checkpoints
+## Checkpoint
 
-The trained checkpoint `mahabharata_30m_weights.pt` is intentionally not committed because it is large. Use Git LFS, a GitHub Release, or Hugging Face Hub for publishing model weights.
+The final trained checkpoint is available at `checkpoints/mahabharata_30m_weights.pt` and is tracked using Git LFS because of its size.
+
+After cloning the repository, install Git LFS and pull the large file:
+
+```bash
+git lfs install
+git lfs pull
+```
+
+See [`checkpoints/README.md`](checkpoints/README.md) for checkpoint details and usage.
+
+## Model Card
+
+A compact model card describing intended use, training data, evaluation, limitations, and reproducibility is available at [`docs/model_card.md`](docs/model_card.md).
 
 ## Limitations
 
@@ -168,4 +186,4 @@ This is an educational/research-scale model trained on a relatively small domain
 
 ## License
 
-Add an appropriate license after reviewing the licensing terms of the source corpus and tokenizer dependencies.
+No project license is currently specified. Source-corpus licensing should be reviewed before publishing corpus extracts or choosing a final project license.
