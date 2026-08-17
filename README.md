@@ -4,7 +4,7 @@ Decoder-only Transformer language model trained from scratch on a self-curated M
 
 This repository packages the training notebook into reusable Python modules, records the final 32M-parameter configuration, and includes experiment outputs and the trained checkpoint used for the final run.
 
-## Highlights
+## Highlights !!
 
 | Item | Value |
 |---|---:|
